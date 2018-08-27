@@ -58,37 +58,51 @@ func (r *Router) initRouter() error {
 		switch k {
 		case strGET:
 			for _, rStmt := range rStmts {
-				rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				if r.optimizationPath != nil{
+					rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				}
 				r.Router.GET(rStmt.urlPath,rStmt.handle)
 			}
 		case strPOST:
 			for _, rStmt := range rStmts {
-				rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				if r.optimizationPath != nil{
+					rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				}
 				r.Router.POST(rStmt.urlPath,rStmt.handle)
 			}
 		case strHEAD:
 			for _, rStmt := range rStmts {
-				rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				if r.optimizationPath != nil{
+					rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				}
 				r.Router.HEAD(rStmt.urlPath,rStmt.handle)
 			}
 		case strOPTIONS:
 			for _, rStmt := range rStmts {
-				rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				if r.optimizationPath != nil{
+					rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				}
 				r.Router.OPTIONS(rStmt.urlPath,rStmt.handle)
 			}
 		case strPUT:
 			for _, rStmt := range rStmts {
-				rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				if r.optimizationPath != nil{
+					rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				}
 				r.Router.PUT(rStmt.urlPath,rStmt.handle)
 			}
 		case strPATCH:
 			for _, rStmt := range rStmts {
-				rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				if r.optimizationPath != nil{
+					rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				}
 				r.Router.PATCH(rStmt.urlPath,rStmt.handle)
 			}
 		case strDELETE:
 			for _, rStmt := range rStmts {
-				rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				if r.optimizationPath != nil{
+					rStmt.urlPath = r.optimizationPath(rStmt.urlPath)
+				}
 				r.Router.DELETE(rStmt.urlPath,rStmt.handle)
 			}
 		default:
