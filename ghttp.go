@@ -47,7 +47,7 @@ type Method func(ctx *Context)
                    '"$http_user_agent" "$http_x_forwarded_for" '
                    '"$gzip_ratio" $request_time $bytes_sent $request_length';
 */
-var accessFormat string = "%s - - [%s] \"%s %s %s\" - %v %v - %s"
+var accessFormat string = "%s - - [%s] \"%s %s %s\" - %v %v - %s %.2fs"
 //
 func New() *GHttp {
 	g := &GHttp{}
@@ -74,9 +74,12 @@ func (g *GHttp) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		responseWriter: w,
 		statusCode:     http.StatusOK,
 	}
+	beginTime := time.Now()
 	defer func() {
 		nowTime := time.Now().Format("2006-01-02 15:04:05")
-		accessLog := fmt.Sprintf(accessFormat ,req.RemoteAddr,nowTime, req.Method, req.RequestURI,req.Proto, respW.statusCode,respW.contentLength, req.UserAgent())
+		userTime := time.Now().UnixNano() - beginTime.UnixNano()
+		ms := float64(userTime)/float64(time.Second)
+		accessLog := fmt.Sprintf(accessFormat ,req.RemoteAddr,nowTime, req.Method, req.RequestURI,req.Proto, respW.statusCode,respW.contentLength, req.UserAgent(),ms)
 		if g.gLogger != nil {
 			g.gLogger.Println(accessLog)
 		}
