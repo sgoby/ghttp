@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"github.com/sgoby/ghttp/validator"
 	"fmt"
+	"net/url"
 )
 //
 type RequestInput struct {
@@ -114,6 +115,14 @@ func (i *RequestInput) Bool(key string, defaultVals ...bool) (bool, error) {
 }
 func (i *RequestInput) Slice(key string, defaultVals ...bool) []interface{} {
 	return nil
+}
+
+//
+func (i *RequestInput) Form() url.Values {
+	if i.request.Form == nil {
+		i.request.ParseMultipartForm(32 << 20)
+	}
+	return i.request.Form
 }
 
 //
