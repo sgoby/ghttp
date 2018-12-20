@@ -47,7 +47,8 @@ func NewMiddleware(path string) (*Middleware,error){
 func (m *Middleware) ServeHTTP(w *ResponseWriter, req *http.Request){
 	ctx := NewContext(w,req)
 	ctx.setNextServeHTTP(m.Router)
-	m.middFunc(&ctx)
+	w.setContext(ctx)
+	m.middFunc(ctx)
 }
 //
 func(m *Middleware) matchPath(path string) bool{

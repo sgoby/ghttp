@@ -31,9 +31,15 @@ type routerStmt struct {
 
 //
 func (rs *routerStmt) handle(w http.ResponseWriter,r *http.Request,argus httprouter.Params){
-	ctx := NewContext(w, r)
-	ctx.SetParams(argus)
-	rs.handleMethod(&ctx)
+	var ctx *Context
+	if customizeW,ok := w.(*ResponseWriter);ok{
+		ctx = customizeW.getContext()
+	}
+	if ctx == nil{
+		ctx = NewContext(w, r)
+		ctx.SetParams(argus)
+	}
+	rs.handleMethod(ctx)
 }
 //
 func NewRouter() *Router {

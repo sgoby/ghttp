@@ -17,16 +17,28 @@ type ResponseWriter struct {
 	responseWriter http.ResponseWriter
 	statusCode     int
 	contentLength  int
+	ctx            *Context
 }
 
+//
+func (rw *ResponseWriter) setContext(ctx *Context) {
+	rw.ctx = ctx
+}
+
+//
+func (rw *ResponseWriter) getContext() (ctx *Context) {
+	return rw.ctx
+}
+
+//
 func (rw *ResponseWriter) Header() http.Header {
 	return rw.responseWriter.Header()
 }
 
 //Write([]byte) (int, error)
-func (rw *ResponseWriter) Write(val []byte) (len int,err error) {
-	len,err = rw.responseWriter.Write(val)
-	if err != nil{
+func (rw *ResponseWriter) Write(val []byte) (len int, err error) {
+	len, err = rw.responseWriter.Write(val)
+	if err != nil {
 		return
 	}
 	rw.contentLength += len
@@ -64,10 +76,12 @@ func (g *GHttp) Use(m *Middleware) {
 func (g *GHttp) LoadRouter(r *Router) {
 	g.Router = r
 }
+
 //
 func (g *GHttp) SetAccessLogger(plog *log.Logger) {
 	g.gLogger = plog
 }
+
 //
 func (g *GHttp) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	respW := &ResponseWriter{
@@ -78,8 +92,8 @@ func (g *GHttp) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer func() {
 		nowTime := time.Now().Format("2006-01-02 15:04:05")
 		userTime := time.Now().UnixNano() - beginTime.UnixNano()
-		ms := float64(userTime)/float64(time.Second)
-		accessLog := fmt.Sprintf(accessFormat ,req.RemoteAddr,nowTime, req.Method, req.RequestURI,req.Proto, respW.statusCode,respW.contentLength, req.UserAgent(),ms)
+		ms := float64(userTime) / float64(time.Second)
+		accessLog := fmt.Sprintf(accessFormat, req.RemoteAddr, nowTime, req.Method, req.RequestURI, req.Proto, respW.statusCode, respW.contentLength, req.UserAgent(), ms)
 		if g.gLogger != nil {
 			g.gLogger.Println(accessLog)
 		}
@@ -90,13 +104,13 @@ func (g *GHttp) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		if m.matchPath(req.URL.Path) {
 			m.ServeHTTP(respW, req)
 			middlewareCount += 1
-			if m.len() > 0{
+			if m.len() > 0 {
 				break
 			}
 			continue
 		}
 	}
-	if middlewareCount <= 0{
+	if middlewareCount <= 0 {
 		g.Router.ServeHTTP(respW, req)
 	}
 }

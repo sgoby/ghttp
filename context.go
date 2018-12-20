@@ -12,19 +12,34 @@ type Context struct {
 	ResponseWriter http.ResponseWriter
 	Input          *RequestInput
 	Params         httprouter.Params
+	dataMap        map[string]interface{}
 	nextServeHTTP  http.Handler
 }
 
-func NewContext(w http.ResponseWriter, r *http.Request) Context {
-	ctx := Context{
+func NewContext(w http.ResponseWriter, r *http.Request) *Context {
+	ctx := &Context{
 		Request:        r,
 		ResponseWriter: w,
 		Input:          newInput(r),
+		dataMap:        make(map[string]interface{}),
 	}
 	return ctx
 }
+//
+func (ctx *Context) SetData(key string,val interface{}) {
+	ctx.dataMap[key] = val
+}
+//
+func (ctx *Context) GetData(key string) interface{}{
+	return ctx.dataMap[key]
+}
+//
 func (ctx *Context) SetParams(p httprouter.Params) {
 	ctx.Params = p
+}
+//
+func (ctx *Context) GetParams(name string) string {
+	return ctx.Params.ByName(name)
 }
 //
 func (ctx *Context) setNextServeHTTP(h http.Handler) {
@@ -51,6 +66,7 @@ func (ctx *Context) Print(val ...interface{}) {
 
 //
 func (ctx *Context) Json(val interface{}) error {
+	ctx.ResponseWriter.Header().Set("content-type", "application/json")
 	paramJson, err := json.Marshal(val)
 	if err != nil {
 		return err
