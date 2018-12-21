@@ -37,8 +37,8 @@ func (rs *routerStmt) handle(w http.ResponseWriter,r *http.Request,argus httprou
 	}
 	if ctx == nil{
 		ctx = NewContext(w, r)
-		ctx.SetParams(argus)
 	}
+	ctx.SetParams(argus)
 	rs.handleMethod(ctx)
 }
 //
