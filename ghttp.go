@@ -81,7 +81,40 @@ func (g *GHttp) LoadRouter(r *Router) {
 func (g *GHttp) SetAccessLogger(plog *log.Logger) {
 	g.gLogger = plog
 }
-
+//
+func (g *GHttp)ListenAndVerifyClientCert(addr,caFile,certFile, keyFile string) error{
+	for _, m := range g.middlewares {
+		m.initRouter()
+	}
+	g.initRouter()
+	httpServer,err := g.getHttpServerTLS(addr,caFile)
+	if err != nil{
+		return err
+	}
+	//
+	return httpServer.ListenAndServeTLS(certFile, keyFile)
+}
+//https
+func (g *GHttp)ListenAndServeTLS(addr,certFile, keyFile string) error{
+	for _, m := range g.middlewares {
+		m.initRouter()
+	}
+	g.initRouter()
+	httpServer,err := g.getHttpServer(addr)
+	if err != nil{
+		return err
+	}
+	//
+	return httpServer.ListenAndServeTLS(certFile, keyFile)
+}
+//
+func (g *GHttp) ListenAndServe(addr string) {
+	for _, m := range g.middlewares {
+		m.initRouter()
+	}
+	g.initRouter()
+	http.ListenAndServe(addr, g)
+}
 //
 func (g *GHttp) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	respW := &ResponseWriter{
@@ -115,11 +148,4 @@ func (g *GHttp) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//
-func (g *GHttp) ListenAndServe(addr string) {
-	for _, m := range g.middlewares {
-		m.initRouter()
-	}
-	g.initRouter()
-	http.ListenAndServe(addr, g)
-}
+
